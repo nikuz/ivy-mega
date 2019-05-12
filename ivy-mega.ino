@@ -88,7 +88,7 @@ void loop() {
         SerialFrame humidityFrame = SerialFrame("hum", humParam);
         AppSerial::sendFrame(&humidityFrame);
 
-        int soilSensors[] = {1, 2, 3};
+        int soilSensors[3] = {1, 2, 3};
         int soilSensorsCounts = *(&soilSensors + 1) - soilSensors;
         for (int i = 0; i < soilSensorsCounts; i++) {
             const char command[] = "sh";
@@ -99,13 +99,13 @@ void loop() {
             AppSerial::sendFrame(&soilHumidityFrame);
         }
 
-        int soilTemperatureSensors[] = {0, 1, 2};
+        int soilTemperatureSensors[3] = {0, 1, 2};
         int soilTemperatureSensorsCounts = *(&soilTemperatureSensors + 1) - soilTemperatureSensors;
-        for (int i = 0; i < soilTemperatureSensorsCounts; i++) {
+        for (int j = 0; j < soilTemperatureSensorsCounts; j++) {
             const char command[] = "st";
-            const char *commandEnd = Tools::intToChar(i + 1);
+            const char *commandEnd = Tools::intToChar(j + 1);
             strcat(command, commandEnd);
-            const char *soilTemperatureParam = Sensor::getSoilTemperature(soilTemperatureSensors[i]);
+            const char *soilTemperatureParam = Sensor::getSoilTemperature(soilTemperatureSensors[j]);
             SerialFrame soilTemperatureFrame = SerialFrame(command, soilTemperatureParam);
             AppSerial::sendFrame(&soilTemperatureFrame);
         }
