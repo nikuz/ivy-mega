@@ -9,8 +9,11 @@
 int TimeReadInterval = 1;  // read sensor once in two seconds
 unsigned long TimeReadLastTime = millis();
 
-int SensorsReadInterval = 2;  // read sensor once in two seconds
+int SensorsReadInterval = 5;  // read sensor once in 5 seconds
 unsigned long SensorsReadLastTime = millis();
+unsigned long SensorsReadTime = millis();
+unsigned long SensorsTotalTime = millis();
+bool firstLoop = true;
 
 void setup() {
     Serial.begin(115200);
@@ -18,20 +21,25 @@ void setup() {
         ;
     }
     Serial.print("Version: ");
-    Serial.print(VERSION);
+    Serial.println(VERSION);
 
     Serial1.begin(115200);
     while (!Serial1) {
         ;
     }
-
     AppI2C::initiate();
+    DEBUG_PRINTLN("AppI2C initiated");
 #ifdef DEBUG
     AppI2C::scan();
 #endif
     Relay::initiate();
+    DEBUG_PRINTLN("Relay initiated");
     Sensor::initiate();
+    DEBUG_PRINTLN("Sensor initiated");
     AppTime::RTCBegin();
+    DEBUG_PRINTLN("AppTime initiated");
+
+    DEBUG_PRINTLN("Setup done");
 }
 
 void loop() {
@@ -77,8 +85,15 @@ void loop() {
         TimeReadLastTime = millis();
     }
     // sensors
-    if (Tools::timerCheck(SensorsReadInterval, SensorsReadLastTime)) {
+    if (Tools::timerCheck(SensorsReadInterval, SensorsReadLastTime) || firstLoop) {
+        firstLoop = false;
+        DEBUG_PRINT("Wait before next read: ");
+        DEBUG_PRINTLN(millis() - SensorsReadLastTime);
+        SensorsReadTime = millis();
+        SensorsTotalTime = millis();
         Sensor::read();
+        DEBUG_PRINT("Read time remained: ");
+        DEBUG_PRINTLN(millis() - SensorsReadTime);
 
         const char *tempParam = Sensor::getTemperature();
         SerialFrame temperatureFrame = SerialFrame("temp", tempParam);
@@ -114,6 +129,8 @@ void loop() {
         SerialFrame lightIntensityFrame = SerialFrame("light", lightIntensityParam);
         AppSerial::sendFrame(&lightIntensityFrame);
 
+        DEBUG_PRINT("Total time remained: ");
+        DEBUG_PRINTLN(millis() - SensorsTotalTime);
         SensorsReadLastTime = millis();
         Sensor::sleep();
     }

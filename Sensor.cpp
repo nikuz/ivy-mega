@@ -35,14 +35,20 @@ Sensor::~Sensor() {}
 
 void Sensor::initiate() {
     soilTemperatureSensors.begin();
+    DEBUG_PRINTLN(" -- SoilTemperatureSensors initiated");
     AppI2C::select(I2C_LIGHT_SENSOR_ID);
+    DEBUG_PRINTLN(" ---- AppI2C port for LIGHT selected");
     LightSensor.begin();
+    DEBUG_PRINTLN(" -- LightSensor initiated");
     AppI2C::select(I2C_SOIL_SENSOR_1_ID);
     soilSensor1.begin();
+    DEBUG_PRINTLN(" -- soilSensor1 initiated");
     AppI2C::select(I2C_SOIL_SENSOR_2_ID);
     soilSensor2.begin();
+    DEBUG_PRINTLN(" -- soilSensor2 initiated");
     AppI2C::select(I2C_SOIL_SENSOR_3_ID);
     soilSensor3.begin();
+    DEBUG_PRINTLN(" -- soilSensor3 initiated");
 }
 
 void Sensor::read() {

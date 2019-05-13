@@ -11,7 +11,7 @@ public:
 
     static bool timerCheck(int interval, unsigned long lastInitiate);
 
-    static char *intToChar(unsigned int value);
+    static char *intToChar(int value);
 };
 
 #endif /* Tools_h */
