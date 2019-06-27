@@ -9,6 +9,7 @@ static char chunk;
 static byte i = 0;
 static boolean delimiterPassed = false;
 static boolean gotCommand = false;
+static int l = 0;
 
 AppSerial::AppSerial() {}
 
@@ -18,13 +19,15 @@ SerialFrame AppSerial::getFrame() {
     delimiterPassed = false;
     gotCommand = false;
     i = 0;
+    l = 0;
 
     if (Serial1.available() > 0) {
         memset(command, 0, sizeof(command));
         memset(param, 0, sizeof(param));
     }
 
-    while (Serial1.available() > 0 && !gotCommand) {
+    while (Serial1.available() > 0 && !gotCommand && l < 31) {
+        l++;
         delay(1);
         chunk = Serial1.read();
         if (chunk != frameDelimiter && chunk != frameEndMarker) {

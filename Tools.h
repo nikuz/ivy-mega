@@ -12,6 +12,8 @@ public:
     static bool timerCheck(int interval, unsigned long lastInitiate);
 
     static char *intToChar(int value);
+
+    static char *getUptime();
 };
 
 #endif /* Tools_h */

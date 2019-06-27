@@ -12,7 +12,7 @@ bool Tools::timerCheck(int interval, unsigned long lastInitiate) {
 }
 
 char *Tools::intToChar(int value) {
-    static char result[5];
+    static char result[10];
     int strLength = 1;
     if (value > 9999) {
         strLength = 5;
@@ -26,4 +26,16 @@ char *Tools::intToChar(int value) {
     dtostrf(value, strLength, 0, result);
 
     return result;
+}
+
+char *Tools::getUptime() {
+    static char uptimeString[10];
+    const float uptime = millis() / 1000.0L / 60.0L;
+    dtostrf(uptime > 60 ? uptime / 60 : uptime, 3, 1, uptimeString);
+    if (uptime > 60) {
+        strcat(uptimeString, "h");
+    } else {
+        strcat(uptimeString, "m");
+    }
+    return uptimeString;
 }

@@ -5,18 +5,8 @@
 
 // RelayItem({pin}, {name}, {highLevelTrigger}) - highLevelTrigger is true by default
 static RelayItem relays[] = {
-//        RelayItem(53, "light"), // 220V
-//        RelayItem(52, "vent"), // 220V
-//        RelayItem(51, "humidity"), // 220V
-//        RelayItem(50, "water"), // 220V
-//        RelayItem(49, "wmixing"), // 220V
-//        RelayItem(48, "free220"), // 220V
-//        RelayItem(25, "s1", false), // 12V
-//        RelayItem(23, "s2", false), // 12V
-//        RelayItem(32, "s3", false), // 12V
-//        RelayItem(30, "s4", false), // 12V
-//        RelayItem(28, "sHumidity", false), // 12V
-//        RelayItem(26, "wind", false) // 12V
+        RelayItem(25, "heat", false), // 12V
+        RelayItem(23, "valve", false), // 12V
 };
 
 const char relayOnSerialCommand[] = "rOn";
@@ -31,6 +21,7 @@ Relay::~Relay() {}
 void Relay::initiate() {
     int relaysCounts = *(&relays + 1) - relays;
     for (int i = 0; i < relaysCounts; i++) {
+        pinMode(relays[i].pin, OUTPUT);
         // turn off relays by default
         // not all relays is HIGH level triggered
         if (relays[i].highLevelTrigger) {
@@ -42,7 +33,6 @@ void Relay::initiate() {
             Serial.println(relays[i].name);
             digitalWrite(relays[i].pin, HIGH);
         }
-        pinMode(relays[i].pin, OUTPUT);
     }
 }
 
