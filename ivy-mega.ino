@@ -13,7 +13,6 @@ int SensorsReadInterval = 5;  // read sensor once in 5 seconds
 unsigned long SensorsReadLastTime = millis();
 unsigned long SensorsReadTime = millis();
 unsigned long SensorsTotalTime = millis();
-bool firstLoop = true;
 
 void setup() {
     Serial.begin(115200);
@@ -27,6 +26,7 @@ void setup() {
     while (!Serial1) {
         ;
     }
+
     AppI2C::initiate();
     DEBUG_PRINTLN("AppI2C initiated");
 #ifdef DEBUG
@@ -40,20 +40,22 @@ void setup() {
     DEBUG_PRINTLN("AppTime initiated");
 
     DEBUG_PRINTLN("Setup done");
+
+    delay(1000);
 }
 
 void loop() {
-    SerialFrame serialFrame = AppSerial::getFrame();
-    if (strcmp(serialFrame.command, "") != 0) {
+    SerialFrame newSerialFrame = AppSerial::getFrame();
+    if (strcmp(newSerialFrame.command, "") != 0) {
         // relay
-        bool performRelayCommand = Relay::parseSerialCommand(serialFrame.command, serialFrame.param);
+        bool performRelayCommand = Relay::parseSerialCommand(newSerialFrame.command, newSerialFrame.param);
         if (performRelayCommand) {
-            AppSerial::sendFrame(&serialFrame);
+            AppSerial::sendFrame(&newSerialFrame);
         }
         // sync RTC time by NTP
-        AppTime::RTCDateTimeUpdate(serialFrame.command, serialFrame.param);
+        AppTime::RTCDateTimeUpdate(newSerialFrame.command, newSerialFrame.param);
 //        // serial speed test
-//        if (strcmp(serialFrame.command, "test") == 0) {
+//        if (strcmp(newSerialFrame.command, "test") == 0) {
 //            unsigned long testStart = millis();
 //            SerialFrame testFirstFrame = SerialFrame("test", "first");
 //            AppSerial::sendFrame(&testFirstFrame);
@@ -85,8 +87,7 @@ void loop() {
         TimeReadLastTime = millis();
     }
     // sensors
-    if (Tools::timerCheck(SensorsReadInterval, SensorsReadLastTime) || firstLoop) {
-        firstLoop = false;
+    if (Tools::timerCheck(SensorsReadInterval, SensorsReadLastTime)) {
         DEBUG_PRINT("Wait before next read: ");
         DEBUG_PRINTLN(millis() - SensorsReadLastTime);
         SensorsReadTime = millis();
@@ -124,6 +125,9 @@ void loop() {
             SerialFrame soilTemperatureFrame = SerialFrame(command, soilTemperatureParam);
             AppSerial::sendFrame(&soilTemperatureFrame);
         }
+
+        SerialFrame uptimeFrame = SerialFrame("uptime", Tools::getUptime());
+        AppSerial::sendFrame(&uptimeFrame);
 
         const char *lightIntensityParam = Sensor::getLightIntensity();
         SerialFrame lightIntensityFrame = SerialFrame("light", lightIntensityParam);
