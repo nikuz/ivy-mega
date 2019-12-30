@@ -36,17 +36,13 @@ Sensor::~Sensor() {}
 void Sensor::initiate() {
     soilTemperatureSensors.begin();
     DEBUG_PRINTLN(" -- SoilTemperatureSensors initiated");
-    AppI2C::select(I2C_LIGHT_SENSOR_ID);
     DEBUG_PRINTLN(" ---- AppI2C port for LIGHT selected");
     LightSensor.begin();
     DEBUG_PRINTLN(" -- LightSensor initiated");
-    AppI2C::select(I2C_SOIL_SENSOR_1_ID);
     soilSensor1.begin();
     DEBUG_PRINTLN(" -- soilSensor1 initiated");
-    AppI2C::select(I2C_SOIL_SENSOR_2_ID);
     soilSensor2.begin();
     DEBUG_PRINTLN(" -- soilSensor2 initiated");
-    AppI2C::select(I2C_SOIL_SENSOR_3_ID);
     soilSensor3.begin();
     DEBUG_PRINTLN(" -- soilSensor3 initiated");
 }
@@ -56,27 +52,20 @@ void Sensor::read() {
     currentTemperature = sht1x.readTemperatureC();
     currentHumidity = sht1x.readHumidity();
 
-    AppI2C::select(I2C_LIGHT_SENSOR_ID);
     currentLightIntensity = LightSensor.GetLightIntensity();
 
-    AppI2C::select(I2C_SOIL_SENSOR_1_ID);
     soilMoisture1 = soilSensor1.getCapacitance();
 
-    AppI2C::select(I2C_SOIL_SENSOR_2_ID);
     soilMoisture2 = soilSensor2.getCapacitance();
 
-    AppI2C::select(I2C_SOIL_SENSOR_3_ID);
     soilMoisture3 = soilSensor3.getCapacitance();
 }
 
 void Sensor::sleep() {
-    AppI2C::select(I2C_SOIL_SENSOR_1_ID);
     soilSensor1.sleep();
 
-    AppI2C::select(I2C_SOIL_SENSOR_2_ID);
     soilSensor2.sleep();
 
-    AppI2C::select(I2C_SOIL_SENSOR_3_ID);
     soilSensor3.sleep();
 }
 
@@ -118,6 +107,23 @@ char *Sensor::getSoilMoisture(int sensorId) {
 
     char *result = Tools::intToChar(moisture);
     return result;
+}
+
+int Sensor::getSoilMoistureInt(int sensorId) {
+    int moisture;
+    switch (sensorId) {
+        case 1:
+            moisture = soilMoisture1;
+            break;
+        case 2:
+            moisture = soilMoisture2;
+            break;
+        case 3:
+            moisture = soilMoisture3;
+            break;
+    }
+
+    return moisture;
 }
 
 // light

@@ -13,26 +13,45 @@ AppI2C::~AppI2C() {}
 
 void AppI2C::initiate() {
     Wire.begin();
+    digitalWrite(SDA, LOW);
+    digitalWrite(SCL, LOW);
+    Wire.setClock(10000);
 }
 
 void AppI2C::scan() {
     Serial.println("Start TCA devices scanning");
-    for (uint8_t i = 0; i < 8; i++) {
-        select(i);
-        Serial.print("TCA Port #");
-        Serial.println(i);
+    int nDevices = 0;
+    byte error, address;
+    for(address = 1; address < 127; address++) {
+        // The i2c_scanner uses the return value of
+        // the Write.endTransmisstion to see if
+        // a device did acknowledge to the address.
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
 
-        for (uint8_t addr = 0; addr <= 127; addr++) {
-            if (addr == TCAADDR) continue;
-
-            uint8_t data;
-            if (!twi_writeTo(addr, &data, 0, 1, 1)) {
-                Serial.print("Found I2C 0x");
-                Serial.println(addr, HEX);
+        if (error == 0) {
+            Serial.print("I2C device found at address 0x");
+            if (address < 16) {
+                Serial.print("0");
             }
+            Serial.print(address, HEX);
+            Serial.println("  !");
+
+            nDevices++;
+        } else if (error == 4) {
+            Serial.print("Unknown error at address 0x");
+            if (address < 16) {
+                Serial.print("0");
+            }
+            Serial.println(address, HEX);
         }
     }
-    Serial.println("Done!");
+    if (nDevices == 0) {
+        Serial.println("No I2C devices found\n");
+    }
+    else {
+        Serial.println("done\n");
+    }
 }
 
 void AppI2C::select(uint8_t id) {

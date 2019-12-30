@@ -20,7 +20,6 @@ AppTime::AppTime() {}
 AppTime::~AppTime() {}
 
 void AppTime::RTCBegin() {
-    AppI2C::select(0);
     Rtc.Begin();
 
     RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
@@ -45,7 +44,6 @@ void AppTime::RTCBegin() {
 }
 
 char *AppTime::RTCGetTemperature() {
-    AppI2C::select(0);
     RtcTemperature rtcTemp = Rtc.GetTemperature();
     static char temperatureStr[2];
     float rtcTempFloat = rtcTemp.AsFloatDegC();
@@ -59,7 +57,6 @@ char *AppTime::RTCBattery() {
 }
 
 bool AppTime::RTCIsDateTimeValid() {
-    AppI2C::select(0);
     const bool isValid = Rtc.IsDateTimeValid();
 
     if (!isValid) {
@@ -72,7 +69,6 @@ bool AppTime::RTCIsDateTimeValid() {
 }
 
 char *AppTime::RTCGetCurrentTime() {
-    AppI2C::select(0);
     RtcDateTime rtcTime = Rtc.GetDateTime();
     AppTime::RTCIsDateTimeValid();
 
@@ -136,7 +132,6 @@ void AppTime::RTCDateTimeUpdate(const char *command, const char *param) {
         );
 
         RtcDateTime ntpDateTime = RtcDateTime(date, time);
-        AppI2C::select(0);
         Rtc.SetDateTime(ntpDateTime);
     }
 }

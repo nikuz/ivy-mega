@@ -23,6 +23,8 @@ public:
 
     static char *getSoilMoisture(int sensorId);
 
+    static int getSoilMoistureInt(int sensorId);
+
     static char *getLightIntensity();
 };
 
